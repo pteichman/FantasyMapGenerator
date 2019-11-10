@@ -71,23 +71,26 @@ void outputMap(gen::MapGenerator &map) {
 }
 
 std::vector<std::string> getLabelNames(int num) {
-    std::ifstream file(gen::resources::getCityDataResource());
-    std::string jsonstr((std::istreambuf_iterator<char>(file)),
-                         std::istreambuf_iterator<char>());
-    jsoncons::json json = jsoncons::json::parse(jsonstr);
-
-    std::vector<std::string> countries;
-    for (const auto& member : json.members()) {
-        countries.push_back(member.name());
-    }
+    std::ifstream file(gen::config::cityNames);
 
     std::vector<std::string> cities;
-    while ((int)cities.size() < num) {
-        int randidx = rand() % (int)countries.size();
-        std::string country = countries[randidx];
-        for (const auto& member : json[country].elements()) {
-            cities.push_back(member.as<std::string>());
-        }
+    if (file.is_open()) {
+      std::string line;
+      while (getline(file, line)) {
+        cities.push_back(line);
+      }
+      file.close();
+    }
+
+    if ((int)cities.size() < num) {
+      gen::config::print("Warning: not enough lines in " + gen::config::cityNames);
+      if ((int)cities.size() == 0) {
+        cities.push_back("blank");
+      }
+      int need = num - cities.size();
+      for (int i=0; i < need; i++) {
+        cities.push_back(cities[i % cities.size()]);
+      }
     }
 
     std::string temp;

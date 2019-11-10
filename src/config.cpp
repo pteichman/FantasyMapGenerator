@@ -9,6 +9,7 @@ std::string outfileExt = ".png";
 std::string outfile = "output" + outfileExt;
 double erosionAmount = -1.0;
 int erosionIterations = 3;
+std::string cityNames = "citynames.txt";
 int numCities = -1;
 int numTowns = -1;
 int imageWidth = 1920;
@@ -42,6 +43,7 @@ bool parseOptions(int argc, char **argv) {
         opts.output       = arg_filen(NULL, NULL, "<file>", 0, 1, "output file"),
         opts.eroamount    = arg_dbln("e", "erosion-amount", "<float>", 0, 1, "erosion amount"),
         opts.erosteps     = arg_intn(NULL, "erosion-steps", "<int>", 0, 1, "number of erosion iterations"),
+        opts.citynames    = arg_filen(NULL, "city-names", "filename", 0, 1, "file of city/town names"),
         opts.ncities      = arg_intn("c", "cities", "<int>", 0, 1, "number of generated cities"),
         opts.ntowns       = arg_intn("t", "towns", "<int>", 0, 1, "number of generated towns"),
         opts.size         = arg_strn(NULL, "size", "<widthpx:heightpx>", 0, 1, "set output image size"),
@@ -126,6 +128,7 @@ bool _setOptions(OptionArgs opts) {
     if (!_setOutputFile(opts.outfile, opts.output)) { return false; }
     if (!_setErosionAmount(opts.eroamount)) { return false; }
     if (!_setErosionIterations(opts.erosteps)) { return false; }
+    if (!_setCityNames(opts.citynames)) { return false; }
     if (!_setNumCities(opts.ncities)) { return false; }
     if (!_setNumTowns(opts.ntowns)) { return false; }
     if (!_setImageSize(opts.size)) { return false; }
@@ -171,17 +174,17 @@ bool _setResolution(arg_dbl *res) {
     return true;
 }
 
-bool _setOutputFile(arg_file *outfile1, arg_file *outfile2) {
-    if (outfile1->count > 0) {
-        gen::config::outfile = outfile1->filename[0];
-        gen::config::outfileExt = outfile1->extension[0];
-    } else if (outfile2->count > 0) {
-        gen::config::outfile = outfile2->filename[0];
-        gen::config::outfileExt = outfile2->extension[0];
-    }
+ bool _setOutputFile(arg_file *outfile1, arg_file *outfile2) {
+   if (outfile1->count > 0) {
+     gen::config::outfile = outfile1->filename[0];
+     gen::config::outfileExt = outfile1->extension[0];
+   } else if (outfile2->count > 0) {
+     gen::config::outfile = outfile2->filename[0];
+     gen::config::outfileExt = outfile2->extension[0];
+   }
 
-    return true;
-}
+   return true;
+ }
 
 bool _setErosionAmount(arg_dbl *amount) {
     if (amount->count == 0) {
@@ -213,6 +216,14 @@ bool _setErosionIterations(arg_int *iterations) {
     }
 
     gen::config::erosionIterations = n;
+
+    return true;
+}
+
+bool _setCityNames(arg_file *citynames) {
+    if (citynames->count > 0) {
+        gen::config::cityNames = citynames->filename[0];
+    }
 
     return true;
 }

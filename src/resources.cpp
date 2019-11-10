@@ -10,16 +10,8 @@ namespace resources {
         return std::string(RESOURCES_FONT_DATA_DIRECTORY);
     }
 
-    std::string getCityDataDirectory() {
-        return std::string(RESOURCES_CITY_DATA_DIRECTORY);
-    }
-
     std::string getFontDataResource() {
         return std::string(RESOURCES_FONT_DATA_RESOURCE);
-    }
-
-    std::string getCityDataResource() {
-        return std::string(RESOURCES_CITY_DATA_RESOURCE);
     }
 }
 }
