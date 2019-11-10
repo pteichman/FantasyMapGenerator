@@ -55,7 +55,7 @@ public:
 
     void outputVoronoiDiagram(std::string filename);
     void outputHeightMap(std::string filename);
-    std::vector<char> getDrawData();
+    jsoncons::json getDrawData();
 
     Extents2d getExtents();
     void setDrawScale(double scale);

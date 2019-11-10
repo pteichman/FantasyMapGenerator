@@ -5,10 +5,11 @@ namespace config {
 
 unsigned int seed = 0;
 double resolution = 0.08;
-std::string outfileExt = ".png";
+std::string outfileExt = "";
 std::string outfile = "output" + outfileExt;
 double erosionAmount = -1.0;
 int erosionIterations = 3;
+std::string font = "Times New Roman";
 std::string cityNames = "citynames.txt";
 int numCities = -1;
 int numTowns = -1;
@@ -43,6 +44,7 @@ bool parseOptions(int argc, char **argv) {
         opts.output       = arg_filen(NULL, NULL, "<file>", 0, 1, "output file"),
         opts.eroamount    = arg_dbln("e", "erosion-amount", "<float>", 0, 1, "erosion amount"),
         opts.erosteps     = arg_intn(NULL, "erosion-steps", "<int>", 0, 1, "number of erosion iterations"),
+        opts.font         = arg_strn(NULL, "font", "<font name>", 0, 1, "city/town label font"),
         opts.citynames    = arg_filen(NULL, "city-names", "filename", 0, 1, "file of city/town names"),
         opts.ncities      = arg_intn("c", "cities", "<int>", 0, 1, "number of generated cities"),
         opts.ntowns       = arg_intn("t", "towns", "<int>", 0, 1, "number of generated towns"),
@@ -128,6 +130,7 @@ bool _setOptions(OptionArgs opts) {
     if (!_setOutputFile(opts.outfile, opts.output)) { return false; }
     if (!_setErosionAmount(opts.eroamount)) { return false; }
     if (!_setErosionIterations(opts.erosteps)) { return false; }
+    if (!_setFont(opts.font)) { return false; }
     if (!_setCityNames(opts.citynames)) { return false; }
     if (!_setNumCities(opts.ncities)) { return false; }
     if (!_setNumTowns(opts.ntowns)) { return false; }
@@ -164,7 +167,7 @@ bool _setResolution(arg_dbl *res) {
 
     double r = res->dval[0];
     if (r <= 0) {
-        std::cout << "error: resolution must be greater than zero." << std::endl; 
+        std::cout << "error: resolution must be greater than zero." << std::endl;
         std::cout << "resolution: " << r << std::endl;
         return false;
     }
@@ -193,7 +196,7 @@ bool _setErosionAmount(arg_dbl *amount) {
 
     double e = amount->dval[0];
     if (e <= 0) {
-        std::cout << "error: erosion amount must be greater than zero." << std::endl; 
+        std::cout << "error: erosion amount must be greater than zero." << std::endl;
         std::cout << "erosion amount: " << e << std::endl;
         return false;
     }
@@ -210,13 +213,21 @@ bool _setErosionIterations(arg_int *iterations) {
 
     int n = iterations->ival[0];
     if (n < 0) {
-        std::cout << "error: erosion iterations must be greater than or equal to zero." << std::endl; 
+        std::cout << "error: erosion iterations must be greater than or equal to zero." << std::endl;
         std::cout << "erosion iterations: " << n << std::endl;
         return false;
     }
 
     gen::config::erosionIterations = n;
 
+    return true;
+}
+
+bool _setFont(arg_str *font) {
+    if (font->count > 0) {
+        std::istringstream istr(font->sval[0]);
+        istr >> gen::config::font;
+    }
     return true;
 }
 
@@ -235,7 +246,7 @@ bool _setNumCities(arg_int *ncities) {
 
     int n = ncities->ival[0];
     if (n < 0) {
-        std::cout << "error: number of cities must be greater than or equal to zero." << std::endl; 
+        std::cout << "error: number of cities must be greater than or equal to zero." << std::endl;
         std::cout << "number of cities: " << n << std::endl;
         return false;
     }
@@ -252,7 +263,7 @@ bool _setNumTowns(arg_int *ntowns) {
 
     int n = ntowns->ival[0];
     if (n < 0) {
-        std::cout << "error: number of towns must be greater than or equal to zero." << std::endl; 
+        std::cout << "error: number of towns must be greater than or equal to zero." << std::endl;
         std::cout << "number of towns: " << n << std::endl;
         return false;
     }
@@ -314,7 +325,7 @@ bool _setDrawScale(arg_dbl *drawscale) {
 
     double s = drawscale->dval[0];
     if (s <= 0) {
-        std::cout << "error: draw scale must be greater than zero." << std::endl; 
+        std::cout << "error: draw scale must be greater than zero." << std::endl;
         std::cout << "draw size: " << s << std::endl;
         return false;
     }

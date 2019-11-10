@@ -27,47 +27,38 @@ dcel::Point randomDirection() {
     return dcel::Point(sin(angle), cos(angle));
 }
 
+void writeFile(std::string filename, std::vector<char> contents) {
+    std::ofstream file(filename);
+    file << std::string(contents.data());
+    file.close();
+}
+
+std::vector<char> renderJson(jsoncons::json obj) {
+    std::string strout = obj.as<std::string>();
+    std::vector<char> charvect(strout.begin(), strout.end());
+    charvect.push_back('\0');
+    return charvect;
+}
+
+std::vector<char> renderSvg(jsoncons::json obj, std::string font) {
+    std::string strout = gen::render::drawSvg(obj, font);
+    std::vector<char> charvect(strout.begin(), strout.end());
+    charvect.push_back('\0');
+    return charvect;
+}
+
 void outputMap(gen::MapGenerator &map) {
     gen::config::print("Generating map draw data...");
     StopWatch timer;
     timer.start();
-    std::vector<char> drawdata = map.getDrawData();
+    jsoncons::json drawdata = map.getDrawData();
     timer.stop();
     gen::config::print("Finished Generating map draw data in " +
                        gen::config::toString(timer.getTime()) + " seconds.\n");
 
     std::string outfile = gen::config::outfile;
-    std::string outfileExt = gen::config::outfileExt;
-    #ifdef PYTHON_RENDERING_SUPPORTED
-        if (outfileExt != std::string(".png")) {
-            outfile += ".png";
-        }
-
-        timer.reset();
-        timer.start();
-        gen::config::print("Drawing map...");
-        gen::render::drawMap(drawdata, outfile);
-        timer.stop();
-        gen::config::print("Finished drawing map in " +
-                           gen::config::toString(timer.getTime()) + " seconds.\n");
-
-        gen::config::print("Wrote map to image: " + outfile);
-    #else
-        if (outfileExt != std::string(".json")) {
-            outfile += ".json";
-        }
-
-        std::ofstream file(outfile);
-        file << std::string(drawdata.data());
-        file.close();
-
-        std::string msg("Project build without drawing support. Install Python "
-                        "and the Pycairo graphics library "
-                        "(http://cairographics.org/pycairo/) to enable drawing "
-                        "support.\nWrote map draw data to file: " + outfile);
-        gen::config::print(msg);
-
-    #endif
+    writeFile(outfile + ".json", renderJson(drawdata));
+    writeFile(outfile + ".svg", renderSvg(drawdata, gen::config::font));
 }
 
 std::vector<std::string> getLabelNames(int num) {

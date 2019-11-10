@@ -297,7 +297,7 @@ void gen::MapGenerator::outputHeightMap(std::string filename) {
     file.close();
 }
 
-std::vector<char> gen::MapGenerator::getDrawData() {
+jsoncons::json gen::MapGenerator::getDrawData() {
     if (!_isInitialized) {
         throw std::runtime_error("MapGenerator must be initialized.");
     }
@@ -356,12 +356,7 @@ std::vector<char> gen::MapGenerator::getDrawData() {
     output["town"] = townData;
     output["territory"] = territoryData;
     output["label"] = labelData;
-
-    std::string strout = output.as<std::string>();
-    std::vector<char> charvect(strout.begin(), strout.end());
-    charvect.push_back('\0');
-
-    return charvect;
+    return output;
 }
 
 Extents2d gen::MapGenerator::getExtents() {
